@@ -253,8 +253,8 @@
       width: 100%; height: 100%;
       top: 0; left: 0;
       object-fit: cover;
-      object-position: center 15%;   /* focus on face — upper portion of tall portrait */
-      transform: scale(1.3);          /* zoom in slightly to fill the circle with face */
+      object-position: center 18%;   /* ID headshot: keep face centered in the circle */
+      transform: scale(1.12);
     }
 
     /* avatar + music-wave button share a tight 4px group (Figma node 594:6228) */

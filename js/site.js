@@ -29,7 +29,7 @@ const NAV_HTML = `
     <div class="nav-pill" id="nav-pill">
       <div class="nav-id">
         <a class="nav-avatar" href="/#work" aria-label="Ammar Shaikh — home">
-          <img src="/assets/ammar1.jpeg" alt="Ammar Shaikh">
+          <img src="/assets/ammar-nav.jpg" alt="Ammar Shaikh" width="40" height="40">
         </a>
       </div>
       <div class="avail-tag" aria-hidden="true">
@@ -256,20 +256,41 @@ function initContact() {
     sendBtn.disabled = true;
     sendLbl.textContent = 'Sending…';
     try {
-      const res = await fetch('https://formsubmit.co/ajax/' + CONTACT_EMAIL, {
+      // Dual-write: save to Supabase DB + email via FormSubmit (parallel)
+      const supabaseInsert = window.__supabase
+        ? window.__supabase.from('contact_submissions').insert({
+            name: data.name,
+            email: data.email,
+            message: data.message
+          })
+        : Promise.resolve();
+
+      const emailSend = fetch('https://formsubmit.co/ajax/' + CONTACT_EMAIL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
         body: JSON.stringify({
           name: data.name,
           email: data.email,
           message: data.message,
-          _subject: 'Portfolio inquiry — ' + data.name,
+          _subject: '🚀 New Client Lead — ' + data.name,
           _replyto: data.email,
           _template: 'table',
           _captcha: 'false'
         })
       });
-      if (!res.ok) throw new Error('send failed');
+
+      const [sbResult, emailRes] = await Promise.allSettled([supabaseInsert, emailSend]);
+
+      // Log Supabase errors silently (email still delivers)
+      if (sbResult.status === 'fulfilled' && sbResult.value?.error) {
+        console.warn('[Supabase] Insert error:', sbResult.value.error.message);
+      }
+
+      // If email failed, surface the error
+      if (emailRes.status === 'rejected' || (emailRes.status === 'fulfilled' && !emailRes.value.ok)) {
+        throw new Error('email send failed');
+      }
+
       form.hidden = true;
       const done = drawer.querySelector('.cd-done');
       done.hidden = false;
