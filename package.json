@@ -1,11 +1,11 @@
 {
   "name": "ammar-shaikh-portfolio",
   "version": "1.0.0",
-  "description": "Ammar Shaikh — Full-Stack & MERN Developer Portfolio",
+  "description": "Ammar Shaikh \u2014 Full-Stack & MERN Developer Portfolio",
   "private": true,
   "scripts": {
-    "dev": "vite",
-    "build": "vite build",
+    "dev": "node api.js && vite",
+    "build": "node api.js && vite build",
     "preview": "vite preview"
   },
   "devDependencies": {

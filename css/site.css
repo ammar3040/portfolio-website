@@ -827,8 +827,8 @@
       content: '';
       position: absolute;
       inset: 0;
-      background-image: url("../assets/imgNoiseTexture.png");
-      background-size: 1024px 1024px;
+      background-image: url("../assets/imgNoiseTexture-opt.webp");
+      background-size: 512px 512px;
       opacity: 0.08;
       pointer-events: none;
     }

@@ -1006,7 +1006,7 @@ const pageLoader = (() => {
     Promise.all([capped, minWait]).then(hide);
   }
 
-  function show(ready, opts) { reveal(); settle(ready, opts || { min: 1200, cap: 4000 }); }
+  function show(ready, opts) { reveal(); settle(ready, opts || { min: 400, cap: 2000 }); }
 
   function showForView(id) {
     const view = document.getElementById(id);
@@ -1021,15 +1021,12 @@ const pageLoader = (() => {
 window.pageLoader = pageLoader;
 
 // cold load: the loader is already painted from markup — hold it until the web
-// fonts AND every image painted in the first screen have decoded, so the hero
-// reveals fully formed instead of half-baked (assets popping in one after another,
-// which was very visible on mobile). We gate on the whole hero — shader, sun, moon,
-// clouds, the recorder disks/caps/play button — not just the shader. Below-the-fold
-// sections still stream in on scroll as before. (Script is deferred, so the DOM
-// and .hero exist here.)
+// fonts AND the hero shader (LCP image) have decoded, so the hero reveals fully
+// formed. Only the shader matters visually — decorative clouds/sun/moon/noise
+// can stream in after; gating on ALL hero images caused multi-second waits on
+// slow connections (noise texture alone is 2MB).
 (function bootFirstLoad() {
   const fonts = (document.fonts && document.fonts.ready) || Promise.resolve();
-  const hero  = document.querySelector('.hero');
 
   // resolve when an image is both downloaded and decoded (or has failed — never hang)
   const imgReady = (img) => {
@@ -1042,14 +1039,14 @@ window.pageLoader = pageLoader;
     });
   };
 
-  const heroImgs = hero ? Array.from(hero.querySelectorAll('img')) : [];
-  const shaderImg = document.querySelector('.hero-shader');           // belt-and-suspenders
-  if (shaderImg && heroImgs.indexOf(shaderImg) === -1) heroImgs.push(shaderImg);
+  // Only gate on the shader — it's the LCP and the only thing that matters for
+  // first paint quality. Everything else (sun, moon, clouds, noise) is decorative.
+  const shaderImg = document.querySelector('.hero-shader');
 
-  const ready = Promise.all([fonts, ...heroImgs.map(imgReady)]);
-  // cap raised (we now wait for more assets); on slow mobile the cap still guarantees
-  // the user is never trapped, but the common case now holds until the hero is complete.
-  pageLoader.show(ready, { min: 1200, cap: 8000 });
+  const ready = Promise.all([fonts, imgReady(shaderImg)]);
+  // min: 400ms (enough for the Pac-Man to register visually, not a full second+)
+  // cap: 3000ms (never trap the user — the old 8s cap was way too long)
+  pageLoader.show(ready, { min: 400, cap: 3000 });
 })();
 
 class SiteNav extends HTMLElement {
