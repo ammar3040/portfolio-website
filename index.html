@@ -438,8 +438,8 @@
     .hero-noise {
       position: absolute;
       inset: 0;
-      background-image: url("/assets/imgNoiseTexture.png");
-      background-size: 2048px 2048px;
+      background-image: url("/assets/imgNoiseTexture-opt.webp");
+      background-size: 512px 512px;
       opacity: 0.1;
       pointer-events: none;
     }
@@ -1780,8 +1780,8 @@
     /* hero geometry is identical day/night; only the gradient stops (tokens) change.
        night aurora shader export (node 256:1865) */
     body.night .hero-shader { content: url("/assets/hero-shader-night.webp"); }
-    /* finer noise grain at night (day tiles at 2048px) */
-    body.night .hero-noise { background-size: 1024px 1024px; }
+    /* finer noise grain at night (matches opt tile) */
+    body.night .hero-noise { background-size: 512px 512px; }
     /* starfield overlay — night only, screen blend so only the stars show */
     .hero-stars {
       display: none;
@@ -3077,6 +3077,21 @@
     </div>
     <p class="pl-line">Loading…</p>
   </div>
+  <!-- Safety net: if site.js hasn't loaded after 4s, force-dismiss the loader.
+       This prevents the infinite loading screen on slow connections. -->
+  <script>
+  (function(){
+    var SAFETY_CAP = 4000;
+    setTimeout(function(){
+      if (!window.pageLoader) {
+        var pl = document.getElementById('page-loader');
+        if (pl) { pl.classList.add('is-hiding'); setTimeout(function(){ pl.style.display = 'none'; }, 420); }
+        document.documentElement.classList.remove('pl-lock');
+        document.body.classList.remove('pl-lock');
+      }
+    }, SAFETY_CAP);
+  })();
+  </script>
 
   <!-- ════ ROUTE CURTAIN — two panes (each 100vw × 50vh) close to cover the
        outgoing page, the route swaps hidden behind them, then they open
@@ -12408,7 +12423,7 @@
   </script>
 
   <!-- shared chrome components: defines <site-nav> / <site-footer> -->
-  <script src="/js/site.js" defer></script>
+  <script src="/js/site.js"></script>
 
   <script>
   /* design-system gallery: seamless, non-interactive auto-scroll loop */
