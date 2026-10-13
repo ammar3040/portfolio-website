@@ -7605,4 +7605,54 @@ body.night .pl-line { color: var(--c-cream-2); }
        now matches the nav-aware recipe used on the other three case studies
        (var(--cs-navpad) top / var(--cs-pad) sides+bottom) instead of the old
        flat 96px, now that the section is flex-centred full height. */
-  
+
+/* Normal document scrolling avoids repainting overlapping full-screen scenes. */
+html.smooth-sections .hero,
+html.smooth-sections .featured-work,
+html.smooth-sections .testimonials {
+  position: relative !important;
+  top: auto !important;
+  margin-top: 0 !important;
+}
+html.smooth-sections .plane-fly { display: none !important; }
+html.smooth-sections .tiles-row,
+html.smooth-sections .project-tile {
+  --reveal: 1 !important;
+  transform: none !important;
+  opacity: 1 !important;
+  will-change: auto !important;
+}
+html.smooth-sections .intro-type { opacity: 1 !important; }
+html.smooth-sections .t-willow-sway,
+html.smooth-sections .t-willow-skin,
+html.smooth-sections .cs-hero-zoom,
+html.smooth-sections .plant .sway {
+  animation: none !important;
+  will-change: auto !important;
+}
+html.smooth-sections .t-card {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  background: #f4f1e8 !important;
+  will-change: auto !important;
+}
+html.smooth-sections .ft-head { transform: none; will-change: auto; }
+html.smooth-sections .ft-noise { display: none; }
+@media (min-width: 1101px) {
+  html.smooth-sections .t-cards {
+    width: min(1320px, calc(100vw - 64px));
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 24px;
+    height: auto;
+  }
+  html.smooth-sections .t-card {
+    position: relative;
+    width: 100%;
+    min-height: 460px;
+    transform: none !important;
+  }
+}
+
+html.smooth-sections .t-scrub { height: 64px !important; }
+html.smooth-sections body.night .t-card { background: #dce5df !important; }

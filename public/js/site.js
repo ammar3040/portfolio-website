@@ -183,7 +183,7 @@ const FOOTER_HTML = `
     <div class="ft-wavy" aria-hidden="true"></div>
     <!-- the land bleeds wider than the footer; clip it in its OWN wrapper so the footer
           itself can keep overflow:visible (needed so the crest poke isn't cut on iOS) -->
-    <div class="ft-land-clip" aria-hidden="true"><img class="ft-land" src="/assets/footer-land.png" alt=""></div>
+    <div class="ft-land-clip" aria-hidden="true"><img loading="lazy" decoding="async" class="ft-land" src="/assets/footer-land.png" alt=""></div>
     <div class="ft-garden" aria-hidden="true"></div>
 
     <div class="ft-inner">
@@ -213,7 +213,7 @@ function daisySVG() {
   const dots = `<circle cx="45" cy="33" r="1.4" fill="#f6c740"/><circle cx="51" cy="38" r="1.3" fill="#b9791a"/>
     <circle cx="50" cy="32" r="1.2" fill="#b9791a"/><circle cx="44" cy="39" r="1.4" fill="#f6c740"/><circle cx="48" cy="36" r="1.3" fill="#b9791a"/>`;
   return `<svg class="cd-daisy" viewBox="0 0 96 152" width="76" height="152" aria-hidden="true">
-    <g filter="url(#ft-paint)">
+    <g>
       <path d="M48 150 C 54 112 42 78 48 46" stroke="#b06a4d" stroke-width="4.2" fill="none" stroke-linecap="round"/>
       <path d="M48 148 Q 30 132 24 106" stroke="#33361a" stroke-width="3.2" fill="none" stroke-linecap="round"/>
       <path d="M48 148 Q 66 134 71 110" stroke="#3c4020" stroke-width="3.2" fill="none" stroke-linecap="round"/>
@@ -592,28 +592,8 @@ function initMenu() {
 }
 
 function initFooterGrow() {
-      const head = document.querySelector('.ft-head');
-      if (!head) return;
-
-      const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
-      if (reduce) { head.style.setProperty('--ft-grow', '1'); return; }
-
-      let lastP = null;
-      function update() {
-        const vh = Scroll.vh();
-        // the centre point is stable under scale about center, so no measurement feedback.
-        const r = Scroll.rect(head);
-        const mid = (r.top + r.bottom) / 2;
-        const start = vh;          // 0% when the heading's centre is at the viewport bottom
-        const end   = vh * 0.5;    // 100% by the time its centre reaches mid-viewport
-        let p = (start - mid) / (start - end);
-        p = p < 0 ? 0 : p > 1 ? 1 : p;
-        const v = p.toFixed(4);
-        // clamped at 0 for most of the page — don't re-write the same value
-        if (v !== lastP) { head.style.setProperty('--ft-grow', v); lastP = v; }
-      }
-      Scroll.add(update);
-      update();
+  // Keep the contact headline readable without a per-frame layout measurement.
+  document.querySelector('.ft-head')?.style.setProperty('--ft-grow', '1');
 }
 
 function initGarden() {
@@ -662,7 +642,7 @@ function initGarden() {
         return g + '</g>';
       }
       function wrap(w, h, inner) {
-        return `<svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}"><g filter="url(#ft-paint)">${inner}</g></svg>`;
+        return `<svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}"><g>${inner}</g></svg>`;
       }
 
       // daisy — cream petals, orange stippled centre, terracotta stem, olive base fronds
@@ -715,16 +695,6 @@ function initGarden() {
         return { svg: wrap(w, h, `<g class="head">${g}</g>`), h };
       }
 
-      // shared paint-texture filter (gives edges a hand-painted wobble; static, so cheap)
-      const defs = document.createElement('div');
-      defs.setAttribute('aria-hidden', 'true');
-      defs.style.cssText = 'position:absolute;width:0;height:0;overflow:hidden';
-      defs.innerHTML = `<svg><defs><filter id="ft-paint" x="-30%" y="-30%" width="160%" height="160%">
-        <feTurbulence type="fractalNoise" baseFrequency="0.028 0.04" numOctaves="2" seed="6" result="n"/>
-        <feDisplacementMap in="SourceGraphic" in2="n" scale="4" xChannelSelector="R" yChannelSelector="G"/>
-      </filter></defs></svg>`;
-      footer.appendChild(defs);
-
       // ---- ridge profile: sample where the land begins per x, so plants root ON it ----
       const landImg = footer.querySelector('.ft-land');
       let ridgeProf = null, nightProf = null, landTop = 0, landH = 0, landW = 0, footerW = 0;
@@ -733,10 +703,10 @@ function initGarden() {
       // sky, so opacity alone marks its top edge.
       function buildRidge(img, requireDark) {
         try {
-          const W = img.naturalWidth, H = img.naturalHeight;
-          if (!W) return null;
+          if (!img.naturalWidth) return null;
+          const W = 144, H = Math.max(1, Math.round(img.naturalHeight / img.naturalWidth * W));
           const c = document.createElement('canvas'); c.width = W; c.height = H;
-          const ctx = c.getContext('2d'); ctx.drawImage(img, 0, 0);
+          const ctx = c.getContext('2d'); ctx.drawImage(img, 0, 0, W, H);
           const d = ctx.getImageData(0, 0, W, H).data;
           const S = 72, prof = [];
           for (let s = 0; s < S; s++) {
@@ -798,7 +768,7 @@ function initGarden() {
         nightImgStarted = true;
         const nightImg = new Image();
         nightImg.addEventListener('load', () => { nightProf = buildRidge(nightImg, false); reroot(); });
-        nightImg.src = '/assets/land meadow-night.png';
+        nightImg.src = '/assets/about-land-night.png';
       }
       if (document.body.classList.contains('night')) ensureNightProf();
       else {
@@ -809,7 +779,7 @@ function initGarden() {
       }
 
       // ---- populate the garden in a few tight clumps ----
-      const N = 20, plants = [];
+      const N = compactMQ.matches ? 6 : 10, plants = [];
       const nc = 5 + ((Math.random() * 2) | 0);            // 5–6 clumps along the ridge
       const centers = [];
       for (let c = 0; c < nc; c++) centers.push(clamp((c + 0.5) / nc * 100 + rnd(-5, 5), 7, 93));
@@ -874,7 +844,7 @@ function initGarden() {
         cursor.setAttribute('class', 'ft-cursor');
         // dusty-terracotta watering can, tilted to pour down-right (matches the reference art)
         cursor.innerHTML = `
-          <g filter="url(#ft-paint)">
+          <g>
             <g transform="rotate(20 27 27)">
               <path d="M16 21 Q7.5 22 8 29 Q8.3 34 15 34" fill="none" stroke="#c9856f" stroke-width="3.2" stroke-linecap="round"/>
               <path d="M34.5 24 L47 29 L49.5 33.5 L46 37 L33 31 Z" fill="#d69880"/>
@@ -910,7 +880,7 @@ function initGarden() {
       let raf = 0;
 
       function emit(fx0, fy0, n, spread, vy0) {
-        const cap = 90;
+        const cap = 24;
         for (let i = 0; i < n && drops.length < cap; i++) {
           const r = rnd(2.4, 4.6);
           const d = document.createElement('div');
@@ -938,7 +908,6 @@ function initGarden() {
       // ---- pointer wiring ----
       const toFooter = e => { const r = footer.getBoundingClientRect(); return { x: e.clientX - r.left, y: e.clientY - r.top, r }; };
 
-      let lastSpray = 0;
       footer.addEventListener('pointerenter', () => { footer.classList.add('garden-live'); if (cursor) cursor.classList.add('on'); });
       footer.addEventListener('pointerleave', () => { footer.classList.remove('garden-live'); if (cursor) cursor.classList.remove('on'); if (tip) tip.classList.remove('on'); });
 
@@ -951,13 +920,6 @@ function initGarden() {
           tip.style.transform = `translate(${e.clientX + 16}px, ${e.clientY + 2}px)`;
           const q = toFooter(e);
           tip.classList.toggle('on', !onControl(e.target) && nearPlant(q));
-        }
-        if (reduce) return;
-        const now = performance.now();
-        if (now - lastSpray > 120) {                 // subtle continuous mist while moving
-          lastSpray = now;
-          const p = toFooter(e);
-          if (p.y < soilY(p.x / p.r.width)) emit(p.x, p.y + 6, 1, 0.5, 0.4);
         }
       }, { passive: true });
 
@@ -978,7 +940,7 @@ function initGarden() {
       footer.addEventListener('pointerdown', e => {
         // taps on the real controls (headline button, social links) are just taps —
         // they must never water/grow the garden underneath the control being pressed
-        if (onControl(e.target)) return;
+        if (onControl(e.target) || reduce || !fine) return;
         const p = toFooter(e);
         emit(p.x, p.y + 6, reduce ? 5 : 16, 2.6, 0.6);   // click burst
         // growth ceiling: plants stop just below the text block instead of
@@ -1148,7 +1110,24 @@ class SiteFooter extends HTMLElement {
   connectedCallback() {
     this.innerHTML = FOOTER_HTML;
     initFooterGrow();
-    initGarden();
+    const footer = this.querySelector('.footer');
+    const buildGarden = () => {
+      const land = footer.querySelector('.ft-land');
+      if (land.complete) initGarden();
+      else {
+        land.addEventListener('load', initGarden, { once: true });
+        land.addEventListener('error', initGarden, { once: true });
+      }
+    };
+    if ('IntersectionObserver' in window) {
+      const observer = new IntersectionObserver(entries => {
+        if (entries.some(entry => entry.isIntersecting)) {
+          observer.disconnect();
+          buildGarden();
+        }
+      }, { rootMargin: '200px 0px' });
+      observer.observe(footer);
+    } else buildGarden();
     initReveal(this);
   }
 }

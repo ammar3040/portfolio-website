@@ -2590,7 +2590,7 @@ document.documentElement.classList.add('pl-lock');
         let lastF = null;                                // skip identical writes (no repaint)
         function update() {
           raf = 0;
-          if (view.hidden || reduce.matches) { if (lastF !== '') { exp.style.filter = ''; lastF = ''; } return; }
+          if (view.hidden || reduce.matches || document.documentElement.classList.contains('smooth-sections')) { if (lastF !== '') { exp.style.filter = ''; lastF = ''; } return; }
           const vh = window.innerHeight;
           const top = fun.getBoundingClientRect().top;   // fun-facts top in viewport
           const p = ease((vh - top) / vh);               // 0 (just entering) → 1 (covering)
@@ -2960,14 +2960,14 @@ document.documentElement.classList.add('pl-lock');
       let heroH = 0, lastScale = null;
       function updateHeroScale() {
         if (!heroH) heroH = heroEl.offsetHeight;
-        const progress = Math.min(Math.max(Scroll.y() / (heroH * 0.8), 0), 1);
+        const progress = document.documentElement.classList.contains('smooth-sections') ? 0 : Math.min(Math.max(Scroll.y() / (heroH * 0.8), 0), 1);
         const eased = 1 - Math.pow(1 - progress, 3);
         const scale = baseHeroScale() * (1 - eased * 0.12);   // fit-scale × (1.0 → 0.88)
         const t = `scale(${scale.toFixed(4)})`;
         if (t !== lastScale) { heroContent.style.transform = t; lastScale = t; }
       }
-      Scroll.add(updateHeroScale);
-      window.addEventListener('resize', () => { heroH = 0; Scroll.kick(); }, { passive: true });
+      if (!document.documentElement.classList.contains('smooth-sections')) Scroll.add(updateHeroScale);
+      window.addEventListener('resize', () => { heroH = 0; Scroll.kick(); requestAnimationFrame(updateHeroScale); }, { passive: true });
       updateHeroScale();   // apply the fit-scale immediately (before any scroll)
     })();
 
@@ -2999,6 +2999,7 @@ document.documentElement.classList.add('pl-lock');
 
     // ── About intro: line-by-line reveal on scroll ──
     (function () {
+      if (document.documentElement.classList.contains('smooth-sections')) return;
       const container = document.querySelector('.intro-copy');
       const paras = container ? Array.from(container.querySelectorAll('.intro-type')) : [];
       if (!container || !paras.length) return;
@@ -3209,6 +3210,7 @@ document.documentElement.classList.add('pl-lock');
 
     /* ── scroll-driven paper plane + dotted trail ── */
     (function () {
+      if (document.documentElement.classList.contains('smooth-sections')) return;
       const section = document.querySelector('.featured-work');
       const sky = document.querySelector('.sky-band');
       const blurb = document.querySelector('.intro-copy');
@@ -3472,6 +3474,7 @@ document.documentElement.classList.add('pl-lock');
        viewport bottom: it scrolls normally through the tiles, then holds its last
        screen while the (higher z-index) testimonials slides up and overlaps it. */
     (function () {
+      if (document.documentElement.classList.contains('smooth-sections')) return;
       const fw = document.querySelector('.featured-work');
       const testi = document.querySelector('.testimonials');
       if (!fw || !testi) return;
@@ -3632,6 +3635,7 @@ document.documentElement.classList.add('pl-lock');
        The cards stay stacked through the whole slide-in; only once the section has
        pinned (filled the viewport) does further scroll scrub the fan open. */
     (function () {
+      if (document.documentElement.classList.contains('smooth-sections')) return;
       const cards = document.getElementById('t-cards');
       const section = document.querySelector('.testimonials');
       if (!cards || !section) return;
@@ -3853,6 +3857,7 @@ document.documentElement.classList.add('pl-lock');
        into view. The row is scaled as a unit from its centre, so the tiles grow
        toward the page centre. Progress tracks the row's viewport position. ── */
     (function () {
+      if (document.documentElement.classList.contains('smooth-sections')) return;
       const rows = Array.from(document.querySelectorAll('.tiles-row'));
       if (!rows.length) return;
       // Desktop/tablet scales each ROW as a unit (see .tiles-row CSS). On mobile the
