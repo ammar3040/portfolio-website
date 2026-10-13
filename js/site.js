@@ -509,8 +509,28 @@ function initMenu() {
 }
 
 function initFooterGrow() {
-  // Keep the contact headline readable without a per-frame layout measurement.
-  document.querySelector('.ft-head')?.style.setProperty('--ft-grow', '1');
+      const head = document.querySelector('.ft-head');
+      if (!head) return;
+
+      const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+      if (reduce) { head.style.setProperty('--ft-grow', '1'); return; }
+
+      let lastP = null;
+      function update() {
+        const vh = Scroll.vh();
+        // the centre point is stable under scale about center, so no measurement feedback.
+        const r = Scroll.rect(head);
+        const mid = (r.top + r.bottom) / 2;
+        const start = vh;          // 0% when the heading's centre is at the viewport bottom
+        const end   = vh * 0.5;    // 100% by the time its centre reaches mid-viewport
+        let p = (start - mid) / (start - end);
+        p = p < 0 ? 0 : p > 1 ? 1 : p;
+        const v = p.toFixed(4);
+        // clamped at 0 for most of the page — don't re-write the same value
+        if (v !== lastP) { head.style.setProperty('--ft-grow', v); lastP = v; }
+      }
+      Scroll.add(update, document.querySelector('.footer'));
+      update();
 }
 
 function initGarden() {

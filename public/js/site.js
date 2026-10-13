@@ -31,6 +31,11 @@ window.route = window.route || (function () {
 (function () {
   if (window.Scroll) return;
   var subs = [], reads = [], queued = false;
+  var activeTargets = new WeakMap();
+  var visibility = typeof IntersectionObserver === 'function' ? new IntersectionObserver(function (entries) {
+    entries.forEach(function (entry) { activeTargets.set(entry.target, entry.isIntersecting); });
+    schedule();
+  }, { rootMargin: '160px 0px' }) : null;
   var cache = new Map(), want = new Set(), prev = new Set();
   var _y = 0, _vh = 0, _vw = 0;
 
@@ -48,14 +53,21 @@ window.route = window.route || (function () {
       try { reads[i](); } catch (e) { }
     }
     for (var i = 0; i < subs.length; i++) {
-      try { subs[i](); } catch (e) { }
+      try {
+        var sub = subs[i];
+        if (!sub.target || activeTargets.get(sub.target) !== false) sub.fn();
+      } catch (e) { }
     }
     prev = want;
   }
   function schedule() { if (!queued) { queued = true; requestAnimationFrame(frame); } }
 
   window.Scroll = {
-    add: function (fn) { subs.push(fn); schedule(); return fn; },
+    add: function (fn, target) {
+      subs.push({ fn: fn, target: target });
+      if (target && visibility) visibility.observe(target);
+      schedule(); return fn;
+    },
     addRead: function (fn) { reads.push(fn); schedule(); return fn; },
     rect: function (el) {
       var r = cache.get(el);
@@ -592,8 +604,28 @@ function initMenu() {
 }
 
 function initFooterGrow() {
-  // Keep the contact headline readable without a per-frame layout measurement.
-  document.querySelector('.ft-head')?.style.setProperty('--ft-grow', '1');
+      const head = document.querySelector('.ft-head');
+      if (!head) return;
+
+      const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+      if (reduce) { head.style.setProperty('--ft-grow', '1'); return; }
+
+      let lastP = null;
+      function update() {
+        const vh = Scroll.vh();
+        // the centre point is stable under scale about center, so no measurement feedback.
+        const r = Scroll.rect(head);
+        const mid = (r.top + r.bottom) / 2;
+        const start = vh;          // 0% when the heading's centre is at the viewport bottom
+        const end   = vh * 0.5;    // 100% by the time its centre reaches mid-viewport
+        let p = (start - mid) / (start - end);
+        p = p < 0 ? 0 : p > 1 ? 1 : p;
+        const v = p.toFixed(4);
+        // clamped at 0 for most of the page — don't re-write the same value
+        if (v !== lastP) { head.style.setProperty('--ft-grow', v); lastP = v; }
+      }
+      Scroll.add(update, document.querySelector('.footer'));
+      update();
 }
 
 function initGarden() {

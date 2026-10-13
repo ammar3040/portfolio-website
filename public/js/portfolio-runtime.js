@@ -31,6 +31,11 @@ window.route = window.route || (function () {
 (function () {
   if (window.Scroll) return;
   var subs = [], reads = [], queued = false;
+  var activeTargets = new WeakMap();
+  var visibility = typeof IntersectionObserver === 'function' ? new IntersectionObserver(function (entries) {
+    entries.forEach(function (entry) { activeTargets.set(entry.target, entry.isIntersecting); });
+    schedule();
+  }, { rootMargin: '160px 0px' }) : null;
   var cache = new Map(), want = new Set(), prev = new Set();
   var _y = 0, _vh = 0, _vw = 0;
 
@@ -48,14 +53,21 @@ window.route = window.route || (function () {
       try { reads[i](); } catch (e) { }
     }
     for (var i = 0; i < subs.length; i++) {
-      try { subs[i](); } catch (e) { }
+      try {
+        var sub = subs[i];
+        if (!sub.target || activeTargets.get(sub.target) !== false) sub.fn();
+      } catch (e) { }
     }
     prev = want;
   }
   function schedule() { if (!queued) { queued = true; requestAnimationFrame(frame); } }
 
   window.Scroll = {
-    add: function (fn) { subs.push(fn); schedule(); return fn; },
+    add: function (fn, target) {
+      subs.push({ fn: fn, target: target });
+      if (target && visibility) visibility.observe(target);
+      schedule(); return fn;
+    },
     addRead: function (fn) { reads.push(fn); schedule(); return fn; },
     rect: function (el) {
       var r = cache.get(el);
@@ -2966,7 +2978,7 @@ document.documentElement.classList.add('pl-lock');
         const t = `scale(${scale.toFixed(4)})`;
         if (t !== lastScale) { heroContent.style.transform = t; lastScale = t; }
       }
-      if (!document.documentElement.classList.contains('smooth-sections')) Scroll.add(updateHeroScale);
+      if (!document.documentElement.classList.contains('smooth-sections')) Scroll.add(updateHeroScale, heroEl);
       window.addEventListener('resize', () => { heroH = 0; Scroll.kick(); requestAnimationFrame(updateHeroScale); }, { passive: true });
       updateHeroScale();   // apply the fit-scale immediately (before any scroll)
     })();
@@ -3686,7 +3698,7 @@ document.documentElement.classList.add('pl-lock');
       // testimonials' margin-top on load/resize, which moves the flow-top. Drop the
       // cache on those events so the next frame re-derives it.
       function invalidate() { flowTop = null; Scroll.kick(); }
-      Scroll.add(upd);
+      Scroll.add(upd, section);
       window.addEventListener('resize', invalidate);
       window.addEventListener('load', invalidate);
     })();
@@ -3886,9 +3898,10 @@ document.documentElement.classList.add('pl-lock');
         // means each write dirties layout and the next element's read forces a full
         // synchronous relayout — six elements here was ~75% of the whole page's forced
         // reflows per frame. Two passes costs nothing and removes all of them.
-        const rowTops  = rows.map(r => Scroll.rect(r).top);
-        const tileTops = tiles.map(t => Scroll.rect(t).top);
-        rows.forEach((row, i) => {
+        const mobile = Scroll.vw() <= 640;
+        const rowTops = mobile ? [] : rows.map(r => Scroll.rect(r).top);
+        const tileTops = mobile ? tiles.map(t => Scroll.rect(t).top) : [];
+        if (!mobile) rows.forEach((row, i) => {
           const raw = ease((start - rowTops[i]) / (start - end));
           const val = raw <= 0 ? '0' : raw >= 1 ? '1' : raw.toFixed(3);
           if (rowCache.get(row) !== val) {
@@ -3896,7 +3909,7 @@ document.documentElement.classList.add('pl-lock');
             rowCache.set(row, val);
           }
         });
-        tiles.forEach((tile, i) => {
+        if (mobile) tiles.forEach((tile, i) => {
           const raw = ease((start - tileTops[i]) / (start - tileEnd));
           const val = raw <= 0 ? '0' : raw >= 1 ? '1' : raw.toFixed(3);
           if (tileCache.get(tile) !== val) {
@@ -3905,7 +3918,7 @@ document.documentElement.classList.add('pl-lock');
           }
         });
       }
-      Scroll.add(upd);
+      Scroll.add(upd, document.querySelector('.featured-work'));
     })();
 
     /* ── project-tile videos: deferred load + viewport-gated playback. The four
