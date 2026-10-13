@@ -1,18 +1,15 @@
-# Footer and section performance pass
+# Animation-preserving performance pass
 
-The active site is the Next.js page in `app/page.jsx`. It loads shared custom elements from `public/js/site.js` and section interactions from `public/js/portfolio-runtime.js`. Older root HTML/CSS/JS have matching changes for local template previews.
+The active Next.js page loads `public/js/bootstrap.js`, `public/js/site.js`, and `public/js/portfolio-runtime.js`. Legacy HTML/CSS/JS previews have matching changes.
 
-Changes:
-- Home sections use normal document scrolling instead of pinned overlapping scenes.
-- Removed continuous paper-plane path sampling, work-section dimming, project scaling, testimonial fanning and paragraph word-wrap measuring from the default home experience.
-- Desktop testimonials use three responsive columns; the mobile swipe layout remains.
-- Disabled continuous willow/background zoom and garden sway animations.
-- Removed testimonial backdrop blur and footer SVG turbulence/displacement filters.
-- Footer heading is fully visible without a scroll callback.
-- Garden initializes only within 200px of the footer and after the land image loads.
-- Garden uses six plants on compact screens and ten on desktop, previously twenty.
-- Ridge sampling uses a 144-pixel-wide canvas rather than full-resolution image pixels.
-- Removed pointer-move particle emission; desktop click particles are capped at 24. Touch and reduced-motion users do not emit particles.
-- Reduced the old testimonial scroll runway to 64px and fixed the garden's missing night-land URL.
+Restored the reference ZIP’s pinned section transitions, hero scroll scaling, paragraph reveal, plane flight, project scaling, testimonial fan, ambient sway/zoom, and footer heading growth. The static `smooth-sections` mode now applies only when the browser requests reduced motion.
 
-Validation: active and legacy JavaScript syntax, active CSS parsing, and simulated footer initialization checks passed. Production build is blocked: Next.js is not installed, and npm dependency installation fails because registry.npmjs.org cannot resolve. GitHub operations also fail DNS resolution. Browser smoothness and screenshots require a browser-capable environment; no measured frame-rate claim is made.
+Performance work preserves animations:
+- The shared requestAnimationFrame scheduler pauses hero, project reveal, testimonial fan, and footer heading callbacks outside a 160px viewport margin, and refreshes them on re-entry.
+- Project reveals measure only rows on desktop and individual tiles on mobile.
+- Existing plane lookup tables, cached geometry, unchanged-value write guards, off-screen ambient pausing, and deferred video playback remain.
+- Lazy garden initialization, smaller ridge sampling, and capped particles remain.
+
+Removed the portrait icon from the introduction. Raised the hero headline and mobile heading above the sun/cloud layers.
+
+Validation: JavaScript syntax checks, scheduler behavior checks (batched frames, off-screen pause, re-entry, unscoped callbacks), and production Next.js build passed. Browser animation smoothness and frame rates have not been measured.

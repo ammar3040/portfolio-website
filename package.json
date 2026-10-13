@@ -1,12 +1,13 @@
 {
   "name": "ammar-shaikh-portfolio",
   "version": "1.0.0",
-  "description": "Ammar Shaikh — Full-Stack & MERN Developer Portfolio",
+  "description": "Ammar Shaikh \u2014 Full-Stack & MERN Developer Portfolio",
   "private": true,
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start"
+    "dev": "node api.js && next dev",
+    "build": "node api.js && next build",
+    "start": "node api.js && next start",
+    "seo:indexnow": "node scripts/submit-indexnow.mjs"
   },
   "devDependencies": {
     "vite": "^5.4.21"

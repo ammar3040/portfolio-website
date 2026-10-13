@@ -4,8 +4,14 @@ import { BOOTSTRAP_JS } from '../lib/bootstrap';
 
 export const metadata = {
   metadataBase: new URL('https://ammarshaikh.com'),
-  title: 'Ammar Shaikh | Full-Stack Developer in Surat',
-  description: 'Ammar Shaikh is a full-stack developer and UI/UX designer in Surat, India, building React, Next.js and MERN web applications. Explore his work and get in touch.',
+  verification: {
+    google: process.env.GOOGLE_SITE_VERIFICATION || undefined,
+    other: process.env.BING_SITE_VERIFICATION
+      ? { 'msvalidate.01': process.env.BING_SITE_VERIFICATION }
+      : undefined,
+  },
+  title: 'Ammar Shaikh | Full-Stack Software Developer in India',
+  description: 'Ammar Shaikh is a full-stack software developer in Surat, India. Explore React, Next.js, MERN, and backend API work for client projects and developer roles.',
   keywords: ['Ammar Shaikh', 'Ammar Shaikh developer', 'full-stack developer Surat', 'MERN developer', 'React developer'],
   robots: { index: true, follow: true, googleBot: { index: true, follow: true, 'max-image-preview': 'large' } },
   authors: [{ name: 'Ammar Shaikh' }],
@@ -15,8 +21,8 @@ export const metadata = {
     locale: 'en_IN',
     url: 'https://ammarshaikh.com/',
     siteName: 'Ammar Shaikh — Full-Stack Developer & Designer',
-    title: 'Ammar Shaikh — Full-Stack Developer & Designer in Surat | Hire Affordable MERN Developer',
-    description: 'Hire Ammar Shaikh — affordable full-stack developer & UI/UX designer from Surat, India. Expert in MERN stack, React, Node.js, REST APIs, mobile apps & modern design. 15+ production projects shipped. Fast turnaround, budget-friendly rates.',
+    title: 'Ammar Shaikh | Full-Stack Software Developer in India',
+    description: 'Explore Ammar Shaikh’s full-stack development work from Surat, India: React, Next.js, Node.js, MERN applications, and backend APIs. Contact him for projects or developer roles.',
     images: [
       {
         url: '/assets/ammar1.jpeg',
@@ -28,8 +34,8 @@ export const metadata = {
   },
   twitter: {
     card: 'summary',
-    title: 'Ammar Shaikh — Full-Stack Developer & Designer in Surat | Affordable Web & App Development',
-    description: 'Looking for an affordable full-stack developer & designer? Ammar Shaikh designs and builds production-grade websites, web apps, and mobile applications from Surat, India. 3+ years, 15+ live projects.',
+    title: 'Ammar Shaikh | Full-Stack Software Developer in India',
+    description: 'Full-stack software developer in Surat, India. Explore Ammar Shaikh’s React, Node.js, and MERN portfolio for client projects and developer roles.',
     images: ['/assets/ammar1.jpeg'],
   },
   icons: {
@@ -65,31 +71,21 @@ const jsonLd = {
       height: 1024
     },
     {
-      '@type': 'ProfilePage',
-      '@id': 'https://ammarshaikh.com/#profile',
-      url: 'https://ammarshaikh.com/',
-      name: 'Ammar Shaikh — Developer Portfolio',
-      mainEntity: { '@id': 'https://ammarshaikh.com/#person' },
-      primaryImageOfPage: { '@id': 'https://ammarshaikh.com/#portrait' },
-      isPartOf: { '@id': 'https://ammarshaikh.com/#website' }
-    },
-    {
       '@type': 'Person',
       '@id': 'https://ammarshaikh.com/#person',
       name: 'Ammar Shaikh',
-      alternateName: ['Ammar Developer', 'Ammar Shaikh Developer', 'Ammar Designer', 'Ammar Surat'],
-      jobTitle: 'Full-Stack Developer, UI/UX Designer & MERN Stack Engineer',
-      url: 'https://ammarshaikh.com/',
+      jobTitle: 'Full-Stack Software Developer',
+      description: 'Full-stack developer and UI/UX designer based in Surat, Gujarat, India, building web applications and backend APIs.',
+      knowsAbout: ['React', 'Next.js', 'JavaScript', 'Node.js', 'Express', 'MongoDB', 'MERN stack', 'REST APIs', 'UI/UX design', 'Python', 'Laravel'],
       image: { '@id': 'https://ammarshaikh.com/#portrait' },
-      mainEntityOfPage: { '@id': 'https://ammarshaikh.com/#profile' },
+      url: 'https://ammarshaikh.com/',
+      mainEntityOfPage: { '@id': 'https://ammarshaikh.com/hire#profile' },
       email: 'ammar15102004@gmail.com',
       telephone: '+919898326125',
       address: {
         '@type': 'PostalAddress',
-        streetAddress: 'Surat',
         addressLocality: 'Surat',
         addressRegion: 'Gujarat',
-        postalCode: '395003',
         addressCountry: 'IN'
       },
       sameAs: [

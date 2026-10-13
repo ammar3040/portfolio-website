@@ -19,7 +19,7 @@ window.route = window.route || (function () {
   if (p) history.replaceState(null, '', p);
 })();
 
-document.documentElement.classList.add('smooth-sections');
+if (matchMedia('(prefers-reduced-motion: reduce)').matches) document.documentElement.classList.add('smooth-sections');
 
 /* mobile gate: <=820px */
 (function () {
@@ -31,6 +31,11 @@ document.documentElement.classList.add('smooth-sections');
 (function () {
   if (window.Scroll) return;
   var subs = [], reads = [], queued = false;
+  var activeTargets = new WeakMap();
+  var visibility = typeof IntersectionObserver === 'function' ? new IntersectionObserver(function (entries) {
+    entries.forEach(function (entry) { activeTargets.set(entry.target, entry.isIntersecting); });
+    schedule();
+  }, { rootMargin: '160px 0px' }) : null;
   var cache = new Map(), want = new Set(), prev = new Set();
   var _y = 0, _vh = 0, _vw = 0;
 
@@ -48,14 +53,21 @@ document.documentElement.classList.add('smooth-sections');
       try { reads[i](); } catch (e) { }
     }
     for (var i = 0; i < subs.length; i++) {
-      try { subs[i](); } catch (e) { }
+      try {
+        var sub = subs[i];
+        if (!sub.target || activeTargets.get(sub.target) !== false) sub.fn();
+      } catch (e) { }
     }
     prev = want;
   }
   function schedule() { if (!queued) { queued = true; requestAnimationFrame(frame); } }
 
   window.Scroll = {
-    add: function (fn) { subs.push(fn); schedule(); return fn; },
+    add: function (fn, target) {
+      subs.push({ fn: fn, target: target });
+      if (target && visibility) visibility.observe(target);
+      schedule(); return fn;
+    },
     addRead: function (fn) { reads.push(fn); schedule(); return fn; },
     rect: function (el) {
       var r = cache.get(el);
