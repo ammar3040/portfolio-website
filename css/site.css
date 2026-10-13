@@ -1986,14 +1986,52 @@ html.smooth-sections .ft-noise { display: none; }
 html.smooth-sections .t-scrub { height: 64px !important; }
 html.smooth-sections body.night .t-card { background: #dce5df !important; }
 
-.hero-eyebrow .hero-profile {
-  width: 72px !important;
-  height: 72px !important;
-  aspect-ratio: 1;
-  object-fit: cover;
-  object-position: center;
-  border-radius: 16px;
-  vertical-align: middle;
-  flex-shrink: 0;
-  margin-right: 12px;
+
+/* Keep the complete headline, including who, above the sun and clouds. */
+.hero .h-line { z-index: 3; }
+
+/* Smaller desktop deck; the full fan keeps room for shadows at both edges. */
+@media (min-width: 1101px) {
+  .t-cards {
+    width: min(380px, calc((100vw - 112px) / 3));
+    height: 460px;
+    top: calc(50vh - 230px);
+  }
+  .t-card {
+    width: 100%;
+    min-height: 460px;
+    padding: 28px;
+    gap: 16px;
+    border-radius: 28px;
+    transform: translateX(calc(var(--pos) * var(--spread) * (100% + 24px)));
+  }
+  .t-quoteicon { width: 64px; height: 64px; }
+  .t-name { font-size: 20px; white-space: normal; }
 }
+
+/* Client and recruiter pages use readable static content alongside the animated portfolio. */
+.professional-page {
+  width: min(100% - 40px, 1060px);
+  margin: 0 auto;
+  padding: 32px 0 64px;
+  font-family: 'Inter', sans-serif;
+  color: var(--text-title, #060606);
+  line-height: 1.7;
+}
+.professional-page nav, .professional-actions, .professional-links {
+  display: flex; flex-wrap: wrap; gap: 16px 24px;
+}
+.professional-page a, .professional-links a { color: inherit; text-decoration: underline; text-underline-offset: 4px; }
+.professional-page a:focus-visible, .professional-links a:focus-visible { outline: 2px solid currentColor; outline-offset: 5px; }
+.professional-page header { padding: 64px 0 40px; max-width: 850px; }
+.professional-page h1 { font-family: 'DM Serif Display', serif; font-size: clamp(36px, 5vw, 64px); line-height: 1.12; margin: 16px 0 24px; }
+.professional-page h2 { font-size: clamp(24px, 3vw, 32px); line-height: 1.25; margin: 0 0 20px; }
+.professional-page h3 { font-size: 20px; line-height: 1.35; margin: 24px 0 12px; }
+.professional-page p { margin: 0 0 20px; }
+.professional-page section, .professional-page footer { padding: 36px 0; border-top: 1px solid currentColor; }
+.professional-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr)); gap: 24px; }
+.professional-grid article { padding: 24px; background: var(--c-sand); color: var(--c-ink); border-radius: 20px; }
+.professional-grid h3 { margin-top: 0; }
+.professional-location { font-size: 14px; }
+.professional-summary { font-size: clamp(16px, 1.5vw, 20px); line-height: 1.6; margin: 0 0 18px; }
+.professional-links { font-family: 'Inter', sans-serif; font-size: 16px; margin: 0 0 32px; }

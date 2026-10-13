@@ -303,7 +303,7 @@
       /* innerWidth can read 0 in embedded/prerender contexts before the first
          layout — fall back to clientWidth, then the physical screen, so a
          desktop never boots into the static layout by accident. */
-      document.documentElement.classList.add('smooth-sections');
+      if (matchMedia('(prefers-reduced-motion: reduce)').matches) document.documentElement.classList.add('smooth-sections');
       var w = window.innerWidth || document.documentElement.clientWidth || screen.width;
       if (w && w <= 820) document.documentElement.classList.add('cs-static');
     })();
@@ -330,6 +330,11 @@
        whole point is lost. Scroll.kick() re-runs a frame after a layout change. */
     (function () {
       var subs = [], reads = [], queued = false;
+  var activeTargets = new WeakMap();
+  var visibility = typeof IntersectionObserver === 'function' ? new IntersectionObserver(function (entries) {
+    entries.forEach(function (entry) { activeTargets.set(entry.target, entry.isIntersecting); });
+    schedule();
+  }, { rootMargin: '160px 0px' }) : null;
       var cache = new Map(), want = new Set(), prev = new Set();
       var _y = 0, _vh = 0, _vw = 0;
 
@@ -358,7 +363,11 @@
       function schedule() { if (!queued) { queued = true; requestAnimationFrame(frame); } }
 
       window.Scroll = {
-        add: function (fn) { subs.push(fn); schedule(); return fn; },
+        add: function (fn, target) {
+      subs.push({ fn: fn, target: target });
+      if (target && visibility) visibility.observe(target);
+      schedule(); return fn;
+    },
         addRead: function (fn) { reads.push(fn); schedule(); return fn; },
         /* Cached rect. A miss — first frame, or an element this module hasn't read
            before — falls back to a live read and joins the prefetch list, so it's a
@@ -3132,7 +3141,6 @@
     <img class="hero-cloud cloud-b" src="/assets/cloud.svg" alt="" aria-hidden="true">
 
     <p class="hero-eyebrow">
-      <img class="hero-profile" src="/assets/ammar1.jpeg" alt="Ammar Shaikh — Full-Stack Developer in Surat" width="72" height="72" decoding="async">
       Hello, I&rsquo;m Ammar Shaikh. A &ndash;
     </p>
 
@@ -3198,6 +3206,8 @@
     <div class="sky-band" aria-hidden="true"></div>
 
     <div class="intro-copy">
+      <p class="professional-summary">I’m Ammar Shaikh, a full-stack software developer in Surat, Gujarat, India. I build React and Next.js interfaces, MERN web applications, and backend APIs for clients and teams.</p>
+      <nav class="professional-links" aria-label="Work with Ammar"><a href="/services">Development services</a><a href="/hire">Hire me for your team</a></nav>
       <p class="intro-type">Three years shipping production software across MERN, Python, and Laravel &ndash; delivering 15+ live client and in-house applications at CoderKube Technology (including JD Web and Ship), plus independent commercial builds like CrystalStonesMart.com.</p>
       <p class="bold intro-type">I believe great software combines resilient backend architecture with crisp frontend execution &ndash; and I own delivery from database design to the final deployed pixel.</p>
     </div>
@@ -11093,7 +11103,7 @@
         const t = `scale(${scale.toFixed(4)})`;
         if (t !== lastScale) { heroContent.style.transform = t; lastScale = t; }
       }
-      if (!document.documentElement.classList.contains('smooth-sections')) Scroll.add(updateHeroScale);
+      if (!document.documentElement.classList.contains('smooth-sections')) Scroll.add(updateHeroScale, heroEl);
       window.addEventListener('resize', () => { heroH = 0; Scroll.kick(); requestAnimationFrame(updateHeroScale); }, { passive: true });
       updateHeroScale();   // apply the fit-scale immediately (before any scroll)
     })();
@@ -11793,7 +11803,7 @@
       // testimonials' margin-top on load/resize, which moves the flow-top. Drop the
       // cache on those events so the next frame re-derives it.
       function invalidate() { flowTop = null; Scroll.kick(); }
-      Scroll.add(upd);
+      Scroll.add(upd, section);
       window.addEventListener('resize', invalidate);
       window.addEventListener('load', invalidate);
     })();
@@ -11992,16 +12002,17 @@
         // means each write dirties layout and the next element's read forces a full
         // synchronous relayout — six elements here was ~75% of the whole page's forced
         // reflows per frame. Two passes costs nothing and removes all of them.
-        const rowTops  = rows.map(r => Scroll.rect(r).top);
-        const tileTops = tiles.map(t => Scroll.rect(t).top);
-        rows.forEach((row, i) => {
+        const mobile = Scroll.vw() <= 640;
+        const rowTops = mobile ? [] : rows.map(r => Scroll.rect(r).top);
+        const tileTops = mobile ? tiles.map(t => Scroll.rect(t).top) : [];
+        if (!mobile) rows.forEach((row, i) => {
           row.style.setProperty('--reveal', ease((start - rowTops[i]) / (start - end)).toFixed(4));
         });
         tiles.forEach((tile, i) => {
           tile.style.setProperty('--reveal', ease((start - tileTops[i]) / (start - tileEnd)).toFixed(4));
         });
       }
-      Scroll.add(upd);
+      Scroll.add(upd, document.querySelector('.featured-work'));
     })();
 
     /* ── project-tile videos: deferred load + viewport-gated playback. The four
