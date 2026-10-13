@@ -1,0 +1,57 @@
+User-agent: *
+Allow: /
+Sitemap: https://ammarshaikh.dev/sitemap.xml
+
+# LLM & AI Knowledge Files (LLM-readable specifications)
+# See: https://llmstxt.org/
+# https://ammarshaikh.dev/llms.txt
+# https://ammarshaikh.dev/llms-full.txt
+
+# Search Engines
+User-agent: Googlebot
+Allow: /
+
+User-agent: Bingbot
+Allow: /
+
+# OpenAI Crawlers & SearchGPT
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: GPTBot
+Allow: /
+
+User-agent: OAI-SearchBot
+Allow: /
+
+# Perplexity AI
+User-agent: PerplexityBot
+Allow: /
+
+# Anthropic / Claude
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: anthropic-ai
+Allow: /
+
+# Google Gemini / Bard
+User-agent: Google-Extended
+Allow: /
+
+# Apple Intelligence
+User-agent: Applebot
+Allow: /
+
+User-agent: Applebot-Extended
+Allow: /
+
+# Meta AI & Cohere
+User-agent: meta-externalagent
+Allow: /
+
+User-agent: cohere-ai
+Allow: /
+
+User-agent: Diffbot
+Allow: /
