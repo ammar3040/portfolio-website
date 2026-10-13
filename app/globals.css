@@ -7656,3 +7656,15 @@ html.smooth-sections .ft-noise { display: none; }
 
 html.smooth-sections .t-scrub { height: 64px !important; }
 html.smooth-sections body.night .t-card { background: #dce5df !important; }
+
+.hero-eyebrow .hero-profile {
+  width: 72px !important;
+  height: 72px !important;
+  aspect-ratio: 1;
+  object-fit: cover;
+  object-position: center;
+  border-radius: 16px;
+  vertical-align: middle;
+  flex-shrink: 0;
+  margin-right: 12px;
+}

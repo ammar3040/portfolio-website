@@ -112,7 +112,7 @@ const NAV_HTML = `
     <div class="nav-pill" id="nav-pill">
       <div class="nav-id">
         <a class="nav-avatar" href="/#work" aria-label="Ammar Shaikh — home">
-          <img src="/assets/ammar-nav.jpg" alt="Ammar Shaikh" width="40" height="40">
+          <img src="/assets/ammar1.jpeg" alt="Ammar Shaikh" width="40" height="40">
         </a>
       </div>
       <div class="avail-tag" aria-hidden="true">

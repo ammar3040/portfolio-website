@@ -1,11 +1,11 @@
 User-agent: *
 Allow: /
-Sitemap: https://ammarshaikh.dev/sitemap.xml
+Sitemap: https://ammarshaikh.com/sitemap.xml
 
 # LLM & AI Knowledge Files (LLM-readable specifications)
 # See: https://llmstxt.org/
-# https://ammarshaikh.dev/llms.txt
-# https://ammarshaikh.dev/llms-full.txt
+# https://ammarshaikh.com/llms.txt
+# https://ammarshaikh.com/llms-full.txt
 
 # Search Engines
 User-agent: Googlebot

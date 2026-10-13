@@ -1,7 +1,7 @@
 # Ammar Shaikh
 
 > Full-Stack Developer & UI/UX Designer based in Surat, Gujarat, India. Available for hire worldwide.
-> Comprehensive documentation for LLMs & AI crawlers: https://ammarshaikh.dev/llms-full.txt
+> Comprehensive documentation for LLMs & AI crawlers: https://ammarshaikh.com/llms-full.txt
 
 ## About
 
@@ -11,7 +11,7 @@ Ammar Shaikh is a full-stack developer and designer from Surat, Gujarat, India w
 
 - Email: ammar15102004@gmail.com
 - WhatsApp: +91 9898326125
-- Website: https://ammarshaikh.dev
+- Website: https://ammarshaikh.com
 - LinkedIn: https://www.linkedin.com/in/ammar-shaikh-747897250
 - GitHub: https://github.com/ammar3040
 - Instagram: https://www.instagram.com/ammar_3040/

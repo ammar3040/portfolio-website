@@ -4,16 +4,10 @@ import { BOOTSTRAP_JS } from '../lib/bootstrap';
 
 export const metadata = {
   metadataBase: new URL('https://ammarshaikh.com'),
-  title: 'Ammar Shaikh — Full-Stack Developer & Designer in Surat | Hire MERN Stack Engineer | Affordable Web & App Development',
-  description: 'Ammar Shaikh — Full-stack developer and UI/UX designer in Surat, Gujarat, India. 3+ years shipping production MERN apps, React dashboards, mobile applications & beautiful interfaces. Affordable, reliable freelance developer-designer for hire. 15+ live projects. Get a world-class website, software, or app designed and built fast.',
-  keywords: [
-    'full stack developer', 'developer in Surat', 'best cheap developer', 'affordable web developer India',
-    'MERN stack developer', 'freelance developer Surat Gujarat', 'hire full stack developer',
-    'software developer Surat', 'website maker', 'application maker', 'app developer India',
-    'React developer', 'Node.js developer', 'MongoDB developer', 'REST API developer',
-    'best developer in Surat', 'cheap website developer', 'affordable software developer',
-    'UI UX designer Surat', 'web designer India', 'Figma developer'
-  ],
+  title: 'Ammar Shaikh | Full-Stack Developer in Surat',
+  description: 'Ammar Shaikh is a full-stack developer and UI/UX designer in Surat, India, building React, Next.js and MERN web applications. Explore his work and get in touch.',
+  keywords: ['Ammar Shaikh', 'Ammar Shaikh developer', 'full-stack developer Surat', 'MERN developer', 'React developer'],
+  robots: { index: true, follow: true, googleBot: { index: true, follow: true, 'max-image-preview': 'large' } },
   authors: [{ name: 'Ammar Shaikh' }],
   creator: 'Ammar Shaikh',
   openGraph: {
@@ -25,18 +19,18 @@ export const metadata = {
     description: 'Hire Ammar Shaikh — affordable full-stack developer & UI/UX designer from Surat, India. Expert in MERN stack, React, Node.js, REST APIs, mobile apps & modern design. 15+ production projects shipped. Fast turnaround, budget-friendly rates.',
     images: [
       {
-        url: '/assets/og-card.jpg',
-        width: 2400,
-        height: 1260,
+        url: '/assets/ammar1.jpeg',
+        width: 1024,
+        height: 1024,
         alt: 'Ammar Shaikh — Full-Stack Developer, Surat, India',
       },
     ],
   },
   twitter: {
-    card: 'summary_large_image',
+    card: 'summary',
     title: 'Ammar Shaikh — Full-Stack Developer & Designer in Surat | Affordable Web & App Development',
     description: 'Looking for an affordable full-stack developer & designer? Ammar Shaikh designs and builds production-grade websites, web apps, and mobile applications from Surat, India. 3+ years, 15+ live projects.',
-    images: ['/assets/og-card.jpg'],
+    images: ['/assets/ammar1.jpeg'],
   },
   icons: {
     icon: [
@@ -62,13 +56,32 @@ const jsonLd = {
   '@context': 'https://schema.org',
   '@graph': [
     {
+      '@type': 'ImageObject',
+      '@id': 'https://ammarshaikh.com/#portrait',
+      contentUrl: 'https://ammarshaikh.com/assets/ammar1.jpeg',
+      url: 'https://ammarshaikh.com/assets/ammar1.jpeg',
+      caption: 'Ammar Shaikh — Full-Stack Developer in Surat, India',
+      width: 1024,
+      height: 1024
+    },
+    {
+      '@type': 'ProfilePage',
+      '@id': 'https://ammarshaikh.com/#profile',
+      url: 'https://ammarshaikh.com/',
+      name: 'Ammar Shaikh — Developer Portfolio',
+      mainEntity: { '@id': 'https://ammarshaikh.com/#person' },
+      primaryImageOfPage: { '@id': 'https://ammarshaikh.com/#portrait' },
+      isPartOf: { '@id': 'https://ammarshaikh.com/#website' }
+    },
+    {
       '@type': 'Person',
       '@id': 'https://ammarshaikh.com/#person',
       name: 'Ammar Shaikh',
       alternateName: ['Ammar Developer', 'Ammar Shaikh Developer', 'Ammar Designer', 'Ammar Surat'],
       jobTitle: 'Full-Stack Developer, UI/UX Designer & MERN Stack Engineer',
       url: 'https://ammarshaikh.com/',
-      image: 'https://ammarshaikh.com/assets/ammar1.jpeg',
+      image: { '@id': 'https://ammarshaikh.com/#portrait' },
+      mainEntityOfPage: { '@id': 'https://ammarshaikh.com/#profile' },
       email: 'ammar15102004@gmail.com',
       telephone: '+919898326125',
       address: {
